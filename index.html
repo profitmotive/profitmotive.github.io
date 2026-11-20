@@ -66,6 +66,8 @@
 const D = id => 'https://drive.google.com/file/d/' + id + '/view';
 const items = [
   // Newest reel first. To add a breakdown, put it at the TOP of this list.
+  // liveAt (optional): the card stays hidden until this time.
+  {tag:'Import Gap', title:'Drill bits', hook:'A kilo of drill bits from China lands at ~₹370; from Japan ~₹18,000. Indian bits already sell to the USA at ~₹10,332/kg. Where the precision gap is, with proof.', num:'₹695 Cr', sub:'imported in FY26 · +26%', url:D('1W2ewA1dSOqI67oSkzvddnj0UI5rH-8KA'), keys:'drill drill bits bit carbide tungsten hss masonry kennametal tools cutting', liveAt:'2026-11-20T15:45:00+05:30'},
   {tag:'Breakdown', title:'Castor oil', hook:'India grows 80%+ of the world’s castor and sells the oil at ~₹137/kg. Abroad it becomes PA11 plastic. ₹4 of every ₹100 stays here, ₹18 goes there.', num:'$1,057 M', sub:'castor oil exported in FY26 · ₹9,329 Cr', url:D('1L5dJY4doFTL8zWtPFbcB389rO0xva8JC'), keys:'castor oil castor seed castor cake arkema rilsan pa11 jayant gujarat agri export sebacic'},
   {tag:'Import Gap', title:'Badminton shuttlecocks', hook:'Branded tubes cost ~₹290 a shuttle; Uluberia hand-makes them from ₹20. The gap is a trusted ₹100–150 Indian shuttle. Starter unit ≈ ₹8.5 lakh.', num:'₹159 Cr', sub:'imported in FY26 · +65% this year', url:D('1311DQBv_nxEPi06dgDZv9wY-lJZqFrXZ'), keys:'shuttle shuttlecock shuttlecocks badminton feather uluberia yonex cork'},
   {tag:'Import Gap', title:'Hydraulic & pneumatic valves', hook:'Germany sells us ₹681 Cr. German valves land at ~₹5,100/kg; ours sell abroad at ~₹1,700/kg. A starter unit ≈ ₹25 lakh.', num:'₹2,341 Cr', sub:'imported in FY26', url:D('1bbExre0iOOPZo7n2n69aM8yI-fwoF8C9'), keys:'valve valves hydraulic pneumatic janatics jcb cnc germany'},
@@ -82,8 +84,9 @@ const list = document.getElementById('list'), empty = document.getElementById('e
 function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function render(){
   const t = q.value.trim().toLowerCase();
-  const latest = items[0];
-  const shown = items.filter(i => !t || (i.title+' '+i.hook+' '+i.keys).toLowerCase().includes(t));
+  const live = items.filter(i => !i.liveAt || Date.now() >= Date.parse(i.liveAt));
+  const latest = live[0];
+  const shown = live.filter(i => !t || (i.title+' '+i.hook+' '+i.keys).toLowerCase().includes(t));
   list.innerHTML = shown.map(i => `
     <a class="item" href="${i.url}" target="_blank" rel="noopener">
       <div class="top"><span class="tag">${esc(i.tag)}</span>${i===latest?'<span class="new">New</span>':''}</div>
@@ -95,6 +98,8 @@ function render(){
 }
 q.addEventListener('input', render);
 render();
+// re-check every 30 s so a card scheduled with liveAt appears without a reload
+setInterval(render, 30000);
 </script>
 </body>
 </html>
